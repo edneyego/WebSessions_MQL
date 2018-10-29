@@ -64,13 +64,16 @@ bool test_post_form_data(WebSession &x)
    return false;
 }
 
-void test_post_rates()
+bool test_post_rates()
 {
+   string res_name = NULL;
+   string acc_name = AccountInfoString(ACCOUNT_NAME);
+   
    WebSession x("https://postman-echo.com/post");
    x.headers_request()["Content-Type"] = "application/json";
    
    Json json;
-   json["account_name"] = AccountInfoString(ACCOUNT_NAME);
+   json["account_name"] = acc_name;
    MqlRates r[];
    CopyRates(_Symbol, PERIOD_CURRENT, 0, 2, r);
    for(int i=0; i<2; i++){
@@ -79,8 +82,9 @@ void test_post_rates()
    }
    if(x.request_body(json).POST().status_code() == 200){
       json.Deserialize(x.json()["data"].ToStr());
-      Print(json["account_name"].ToStr());
+      res_name = json["account_name"].ToStr();
    }
+   return acc_name == res_name;
 }
 //+------------------------------------------------------------------+
 bool test_basic_auth(WebSession &x)
