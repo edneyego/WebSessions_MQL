@@ -59,8 +59,35 @@ class _NoneType
    template<typename T>
    static bool    IsNone( const T         Value ) { return(Value == NONE_POINTER);}
    
-   
+   static void    SetNone(double   &Value ) { Value = NONE_DOUBLE; }
+   static void    SetNone(float    &Value ) { Value = NONE_FLOAT; }
+   static void    SetNone(int      &Value ) { Value = NONE_INT; }
+   static void    SetNone(uint     &Value ) { Value = NONE_UINT; }
+   static void    SetNone(long     &Value ) { Value = NONE_LONG; }
+   static void    SetNone(ulong    &Value ) { Value = NONE_ULONG; }
+   static void    SetNone(char     &Value ) { Value = NONE_CHAR; }
+   static void    SetNone(uchar    &Value ) { Value = NONE_UCHAR; }
+   static void    SetNone(short    &Value ) { Value = NONE_SHORT; }
+   static void    SetNone(ushort   &Value ) { Value = NONE_USHORT; }
+   static void    SetNone(color    &Value ) { Value = NONE_COLOR; }
+   static void    SetNone(datetime &Value ) { Value = NONE_DATETIME; }
+   static void    SetNone(string   &Value ) { Value = NONE_STRING; }
+   template<typename T>
+   static void    SetNone(T        Value)  { 
+      if(CheckPointer(Value) == POINTER_DYNAMIC){
+         delete Value;
+         Value = NONE_POINTER;
+      }
+   }  
+   template <typename T>
+   static void    ArraySetNone(T &array[]){
+      for(int i=ArraySize(array)-1; i>=0; --i)
+         SetNone(array[i]);
+   }
 };
 
-#define NONE(T)  _NoneType::None((T)NULL)
-#define IS_NONE(VALUE)  _NoneType::IsNone(VALUE)
+#define NONE(T)                _NoneType::None((T)NULL)
+#define IS_NONE(VALUE)         _NoneType::IsNone(VALUE)
+#define SET_NONE(BY_REF)       _NoneType::SetNone(BY_REF)  
+#define ARRAY_SET_NONE(ARRAY)  _NoneType::ArraySetNone(ARRAY)
+  

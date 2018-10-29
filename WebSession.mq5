@@ -10,6 +10,8 @@
 #define TEST(FUNC, SESSION_OBJ) printf("%s:: %s",\
    FUNC(SESSION_OBJ) ? "passed" : "failed", #FUNC);\
    Sleep(1000);
+   
+   
 #include "websession.mqh"
 
 
@@ -28,6 +30,8 @@ void OnStart()
 
    // Testing get headers from file
    TEST(test_headers_from_file, x);
+
+   test_post_rates();
    Print("_+_+_+_+_END REQUESTS TESTS+_+_+_+_+_"); 
 }
 //+------------------------------------------------------------------+
@@ -58,6 +62,25 @@ bool test_post_form_data(WebSession &x)
       return true;
    }
    return false;
+}
+
+void test_post_rates()
+{
+   WebSession x("https://postman-echo.com/post");
+   x.headers_request()["Content-Type"] = "application/json";
+   
+   Json json;
+   json["account_name"] = AccountInfoString(ACCOUNT_NAME);
+   MqlRates r[];
+   CopyRates(_Symbol, PERIOD_CURRENT, 0, 2, r);
+   for(int i=0; i<2; i++){
+      json["rates"][i]["close"] = r[i].close;
+      json["rates"][i]["volume"] = r[i].tick_volume;
+   }
+   if(x.request_body(json).POST().status_code() == 200){
+      json.Deserialize(x.json()["data"].ToStr());
+      Print(json["account_name"].ToStr());
+   }
 }
 //+------------------------------------------------------------------+
 bool test_basic_auth(WebSession &x)
